@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>  
+
+    
+    <base target="_top">
+       
+    <script>        
+        // Event triggered after clicking Mark Like button
+        function updateButton(status, btnId) {
+            if (status) {             
+              $( "#"+btnId ).after(' <i class="fa fa-check-circle" style="color:green"></i>');
+            } else {
+                $( "#"+btnId ).after(' <i class="fa fa-times-circle" style="color:red"></i>');
+            }
+        }
+        
+        // OnClickEvent - Mark Liked on Slack
+        $(document).on("click", ".marks", function(e){    
+            var btnId = $(this).attr('id');
+            var ts = $(this).val();
+            google.script.run.withSuccessHandler(updateButton).withUserObject(btnId).onClickBtn(ts);
+        })   
+        
+        // OnClick Enlarge iframe
+        $(document).on("click", ".enlarge", function(e){  
+            var iframeid = $(this).attr('value');
+            var iframe = $('#' + iframeid);
+            iframe.height(iframe.height() + 150);
+        })   
+
+        // Prevent forms from submitting.
+        function preventFormSubmit() {
+          var forms = document.querySelectorAll('form');
+          for (var i = 0; i < forms.length; i++) {
+            forms[i].addEventListener('submit', function(event) {
+              event.preventDefault();
+            });
+          }
+        }
+        window.addEventListener('load', preventFormSubmit);
+        
+        // Update content after Event submitted
+        function update(stream) {
+          $('#output').html(stream);
+        }
+        
+        // Submit Event when Reload button is clicked
+        function handleFormSubmit(formObject) {
+          google.script.run.withSuccessHandler(update).doReload(formObject);
+        }      
+      </script>
+    
+    <!-- CSS style -->
+    <style>
+      .fb-post { padding: 10px; margin: 1.5em ; text-align: -webkit-center; }
+      .fb-iframe { background-color: white; }
+      .liked-post { background-color: aliceblue; }
+    </style>
+    <!-- End of CSS style -->
+  </head>
+  <body>      
+        
+     <div id="status">
+     </div>
+     
+     <!-- login button -->
+     <button id="logout" type="submit" style="float:right;">Logout</button>
+     <script>
+        $("#logout").click(function(){
+            google.script.run.resetAuth();
+            alert("The paragraph was clicked.");
+            pattern = /story_fbid=([0-9]+)|id=([0-9]+)/g            
+        });        
+     </script>
+     <!-- End of login button -->
+     
+     <!-- Reload form -->
+    <form id="FetchForm" onsubmit="handleFormSubmit(this)" style="display:inline-table;">
+      Num of Message: <input type="number" name="read_limit" min="1" max="100" value="20">
+     <input id="reload" type="submit" value="Reload">
+    </form>
+    <!-- End Reload form -->
+    
+    <!-- Hide button-->
+    <button id="hide" value="false">Hide Liked</button>
+    <script>
+        $("#hide").click(function(){
+            if ($(this).val() == 'false') {
+              $('.liked-post').hide();
+              $(this).val('true');
+              $(this).html('Show Liked');
+            }
+            else {
+              $('.liked-post').show();
+              $(this).val('false');
+              $(this).html('Hide Liked');
+            }            
+        });
+    </script>          
+    <!-- End of Hide button-->
+    
+    <hr>
+   
+  </body>
+</html>
